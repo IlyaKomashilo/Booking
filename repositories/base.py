@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
 
 from src.database import engine
+#print(add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True})) SQL ЛОГ
 
 class BaseRepository:
     model = None
@@ -13,7 +14,6 @@ class BaseRepository:
 
     async def create(self, data: BaseModel):
         add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        print(add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
         return self.schema.model_validate(model, from_attributes=True)
@@ -28,7 +28,6 @@ class BaseRepository:
 
     async def read_one_or_none(self, **filter_by):
         query = select(self.model).filter_by(**filter_by)
-        print(query.compile(engine, compile_kwargs={"literal_binds": True}))
         result = await self.session.execute(query)
         model = result.scalars().one_or_none()
         if model is None:
@@ -38,11 +37,9 @@ class BaseRepository:
 
     async def update(self, data: BaseModel, is_patch: bool = False, **filter_by) -> None:
         edit_data_stmt = update(self.model).filter_by(**filter_by).values(**data.model_dump(exclude_unset=is_patch))
-        print(edit_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
         await self.session.execute(edit_data_stmt)
 
 
     async def delete(self, **filter_by) -> None:
         delete_data_stmt = delete(self.model).filter_by(**filter_by)
-        print(delete_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
         await self.session.execute(delete_data_stmt)
