@@ -21,7 +21,7 @@ async def create_user(data_user: UserRequestCreate):
                                nickname=data_user.nickname,
                                lastname=data_user.lastname,
                                firstname=data_user.firstname,)
-    async with async_session_maker as session:
+    async with async_session_maker() as session:
         user = await UsersRepository(session).create(new_data_user)
         await session.commit()
 
