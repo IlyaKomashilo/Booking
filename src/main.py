@@ -2,11 +2,13 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 
+from src.api.auth import router as router_auth
 from src.api.hotels import router as router_hotels
-from src.config import settings
+
 
 app = FastAPI(docs_url=None)
 
+app.include_router(router_auth)
 app.include_router(router_hotels)
 
 
@@ -23,3 +25,4 @@ async def custom_swagger_ui_html():
 
 if __name__ == '__main__':
     uvicorn.run('src.main:app', reload=True)
+#uvicorn src.main:app для запуска из консоли

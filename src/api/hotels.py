@@ -1,6 +1,6 @@
 from fastapi import Body, APIRouter, Depends
 
-from repositories.hotels import HotelsRepository
+from src.repositories.hotels import HotelsRepository
 from src.api.dependencies import PaginationDep
 from src.schemas.hotels import HotelFilter, HotelCreate
 from src.database import async_session_maker

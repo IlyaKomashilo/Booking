@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
 
-from src.database import engine
+
 #print(add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True})) SQL ЛОГ
 
 class BaseRepository:
