@@ -9,17 +9,20 @@ class HotelsRepository(BaseRepository):
     model = HotelsOrm
     schema = Hotel
 
-    async def read_all(self, location, title, limit, offset) -> list[Hotel]:
+    async def list_hotels(self, location, title, limit, offset) -> list[Hotel]:
         query = select(HotelsOrm).order_by(HotelsOrm.id.desc())
         if title:
-            query = query.filter(func.lower(HotelsOrm.title).contains(title.strip().lower()))
+            query = query.filter(
+                func.lower(HotelsOrm.title).contains(title.strip().lower())
+            )
         if location:
-            query = query.filter(func.lower(HotelsOrm.location).contains(location.strip().lower()))
-        query = (
-            query
-            .limit(limit)
-            .offset(offset)
-        )
+            query = query.filter(
+                func.lower(HotelsOrm.location).contains(location.strip().lower())
+            )
+        query = query.limit(limit).offset(offset)
         result = await self.session.execute(query)
 
-        return [Hotel.model_validate(hotel, from_attributes=True) for hotel in result.scalars().all()]
+        return [
+            Hotel.model_validate(hotel, from_attributes=True)
+            for hotel in result.scalars().all()
+        ]

@@ -23,11 +23,13 @@ def upgrade() -> None:
         "uq_users_email_ci", "users", [sa.literal_column("lower(email)")], unique=True
     )
     op.execute("UPDATE users SET email = lower(email) WHERE email <> lower(email);")
-    op.create_check_constraint("ck_users_email_is_lower", "users", "email = lower(email)")
+    op.create_check_constraint(
+        "ck_users_email_is_lower", "users", "email = lower(email)"
+    )
+
 
 def downgrade() -> None:
     op.drop_index("uq_users_email_ci", table_name="users")
     op.create_unique_constraint(
         op.f("users_email_key"), "users", ["email"], postgresql_nulls_not_distinct=False
     )
-
