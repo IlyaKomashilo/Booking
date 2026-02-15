@@ -40,4 +40,3 @@ def downgrade() -> None:
         type_=sa.VARCHAR(length=254),
         existing_nullable=False,
     )
-

@@ -4,11 +4,11 @@ from fastapi.openapi.docs import get_swagger_ui_html
 
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.api.auth import router as router_auth
 from src.api.hotels import router as router_hotels
-
 
 app = FastAPI(docs_url=None)
 
@@ -16,7 +16,7 @@ app.include_router(router_auth)
 app.include_router(router_hotels)
 
 
-@app.get('/docs', include_in_schema=False)
+@app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
@@ -27,5 +27,5 @@ async def custom_swagger_ui_html():
     )
 
 
-if __name__ == '__main__':
-    uvicorn.run('main:app', reload=True)
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)
