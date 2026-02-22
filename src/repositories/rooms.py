@@ -4,5 +4,7 @@ from src.schemas.rooms import Room
 
 
 class RoomsRepository(BaseRepository):
+    """Репозиторий для работы с категориями номеров."""
+
     model = RoomsOrm
     schema = Room

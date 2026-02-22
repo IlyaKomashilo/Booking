@@ -1,11 +1,10 @@
 from pydantic import BaseModel
-from sqlalchemy import select, insert, delete, update
-
-
-# print(add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True})) SQL ЛОГ
+from sqlalchemy import delete, insert, select, update
 
 
 class BaseRepository:
+    """Базовый репозиторий с типовыми CRUD-операциями."""
+
     model = None
     schema: BaseModel = None
 
@@ -40,7 +39,7 @@ class BaseRepository:
         return self.schema.model_validate(model, from_attributes=True)
 
     async def update(
-            self, data: BaseModel, is_patch: bool = False, **filter_by
+        self, data: BaseModel, is_patch: bool = False, **filter_by
     ) -> None:
         edit_data_stmt = (
             update(self.model)
