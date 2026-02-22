@@ -1,11 +1,14 @@
-from fastapi import Depends, Query, Request, HTTPException
-from pydantic import BaseModel
 from typing import Annotated
+
+from fastapi import Depends, HTTPException, Query, Request
+from pydantic import BaseModel
 
 from src.services.auth import AuthService
 
 
 class PaginationParams(BaseModel):
+    """Параметры пагинации для листинговых endpoint-ов."""
+
     page: Annotated[int | None, Query(default=1, ge=1, description="Номер страницы")]
     per_page: Annotated[
         int | None,
@@ -17,6 +20,8 @@ PaginationDep = Annotated[PaginationParams, Depends()]
 
 
 def read_token(request: Request) -> str:
+    """Извлекает JWT access token из cookie запроса."""
+
     token = request.cookies.get("access_token", None)
     if not token:
         raise HTTPException(status_code=401, detail="Не предоставлен токен доступа")
@@ -24,8 +29,10 @@ def read_token(request: Request) -> str:
 
 
 def read_current_user(token: str = Depends(read_token)) -> int:
+    """Декодирует токен и возвращает идентификатор текущего пользователя."""
+
     data = AuthService().decode_token(token)
     return int(data["user_id"])
 
 
-UseridDep = Annotated[int, Depends(read_current_user)]
+UserIdDep = Annotated[int, Depends(read_current_user)]

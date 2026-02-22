@@ -6,10 +6,13 @@ from src.schemas.hotels import Hotel
 
 
 class HotelsRepository(BaseRepository):
+    """Репозиторий для работы с отелями."""
+
     model = HotelsOrm
     schema = Hotel
 
     async def list_hotels(self, location, title, limit, offset) -> list[Hotel]:
+        """Возвращает список отелей с фильтрацией и пагинацией."""
         query = select(HotelsOrm).order_by(HotelsOrm.id.desc())
         if title:
             query = query.filter(

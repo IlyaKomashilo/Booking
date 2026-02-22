@@ -7,10 +7,13 @@ from src.schemas.users import User, UserWithHashPassword
 
 
 class UsersRepository(BaseRepository):
+    """Репозиторий для работы с пользователями."""
+
     model = UsersOrm
     schema = User
 
     async def read_user_with_hash_password(self, email: EmailStr):
+        """Возвращает пользователя вместе с хэшем пароля по email."""
         query = select(self.model).filter_by(email=email)
         result = await self.session.execute(query)
         model = result.scalars().one_or_none()
