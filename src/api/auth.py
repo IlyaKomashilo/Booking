@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException, Response
 
+from src.api.dependencies import UseridDep
 from src.repositories.users import UsersRepository
 from src.database import async_session_maker
 from src.schemas.users import UserRequestCreate, UserCreate
@@ -67,7 +68,8 @@ async def create_user(
 @router.post(
     "/login",
     summary="Вход пользователя",
-    description="Проверяет email и пароль. При успехе возвращает JWT access token и устанавливает cookie access_token. Ошибки: 401 при неверных учётных данных.",
+    description="Проверяет email и пароль. При успехе возвращает JWT access token и устанавливает cookie access_token."
+                " Ошибки: 401 при неверных учётных данных.",
 )
 async def login_user(
     response: Response,
@@ -119,8 +121,27 @@ async def login_user(
             raise HTTPException(
                 status_code=401, detail="Пользователь с таким email не зарегистрирован"
             )
-        if not AuthService.verify_password(user_in.password, user.hash_password):
+        if not AuthService().verify_password(user_in.password, user.hash_password):
             raise HTTPException(status_code=401, detail="Пароль не верный")
         access_token = AuthService().create_access_token({"user_id": user.id})
         response.set_cookie(key="access_token", value=access_token)
         return {"access_token": access_token}
+
+
+@router.post(
+    "/logout",
+    summary="Выход пользователя",
+    description="Удаляет cookie access_token"
+)
+async def logout_user(response: Response):
+    response.delete_cookie(key="access_token")
+    return {"status": "OK"}
+
+
+@router.get("/me")
+async def read_me(
+        user_id: UseridDep
+):
+    async with async_session_maker() as session:
+        user = await UsersRepository(session).read_one_or_none(id=user_id)
+    return user
