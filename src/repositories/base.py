@@ -38,9 +38,7 @@ class BaseRepository:
             return None
         return self.schema.model_validate(model, from_attributes=True)
 
-    async def update(
-        self, data: BaseModel, is_patch: bool = False, **filter_by
-    ) -> None:
+    async def update(self, data: BaseModel, is_patch: bool = False, **filter_by) -> None:
         edit_data_stmt = (
             update(self.model)
             .filter_by(**filter_by)

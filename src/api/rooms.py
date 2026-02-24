@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Body
 
-from src.database import async_session_maker
-from src.repositories.rooms import RoomsRepository
+from src.api.dependencies import DBDep
 from src.schemas.rooms import (
     RoomCreate,
     RoomCreateRequest,
@@ -91,12 +90,12 @@ ROOM_PATCH_EXAMPLES = {
 )
 async def create_room(
     hotel_id: int,
-    room_in: RoomCreateRequest = Body(openapi_examples=ROOM_CREATE_EXAMPLES),
+    db: DBDep,
+    room_in: RoomCreateRequest = Body(openapi_examples=ROOM_CREATE_EXAMPLES)
 ):
     room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
-    async with async_session_maker() as session:
-        room = await RoomsRepository(session).create(room_data)
-        await session.commit()
+    room = await db.rooms.create(room_data)
+    await db.commit()
     return {"status": "OK", "created_room": room}
 
 
@@ -106,9 +105,11 @@ async def create_room(
     description="Возвращает все категории номеров, созданные для указанного отеля по hotel_id.",
     response_description="Список категорий номеров отеля.",
 )
-async def read_rooms(hotel_id: int):
-    async with async_session_maker() as session:
-        return await RoomsRepository(session).read_filtered(hotel_id=hotel_id)
+async def read_rooms(
+    hotel_id: int,
+    db: DBDep
+):
+    return await db.rooms.read_filtered(hotel_id=hotel_id)
 
 
 @router.get(
@@ -117,11 +118,12 @@ async def read_rooms(hotel_id: int):
     description="Возвращает категорию номера по room_id в рамках указанного отеля hotel_id.",
     response_description="Данные категории номера или null, если запись не найдена.",
 )
-async def read_room(hotel_id: int, room_id: int):
-    async with async_session_maker() as session:
-        return await RoomsRepository(session).read_one_or_none(
-            hotel_id=hotel_id, id=room_id
-        )
+async def read_room(
+    hotel_id: int,
+    room_id: int,
+    db: DBDep
+):
+    return await db.rooms.read_one_or_none(hotel_id=hotel_id, id=room_id)
 
 
 @router.put(
@@ -133,12 +135,12 @@ async def read_room(hotel_id: int, room_id: int):
 async def replace_room(
     hotel_id: int,
     room_id: int,
+    db: DBDep,
     room_in: RoomCreateRequest = Body(openapi_examples=ROOM_CREATE_EXAMPLES),
 ):
     room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
-    async with async_session_maker() as session:
-        await RoomsRepository(session).update(room_data, id=room_id, hotel_id=hotel_id)
-        await session.commit()
+    await db.rooms.update(room_data, id=room_id, hotel_id=hotel_id)
+    await db.commit()
     return {"status": "OK"}
 
 
@@ -151,14 +153,12 @@ async def replace_room(
 async def patch_room(
     hotel_id: int,
     room_id: int,
+    db: DBDep,
     room_in: RoomFilterRequest = Body(openapi_examples=ROOM_PATCH_EXAMPLES),
 ):
     room_data = RoomFilter(hotel_id=hotel_id, **room_in.model_dump(exclude_unset=True))
-    async with async_session_maker() as session:
-        await RoomsRepository(session).update(
-            room_data, id=room_id, hotel_id=hotel_id, is_patch=True
-        )
-        await session.commit()
+    await db.rooms.update(room_data, id=room_id, hotel_id=hotel_id, is_patch=True)
+    await db.commit()
     return {"status": "OK"}
 
 
@@ -168,8 +168,11 @@ async def patch_room(
     description="Удаляет категорию номера по room_id в рамках указанного hotel_id.",
     response_description="Подтверждение успешного удаления категории номера.",
 )
-async def delete_room(hotel_id: int, room_id: int):
-    async with async_session_maker() as session:
-        await RoomsRepository(session).delete(hotel_id=hotel_id, id=room_id)
-        await session.commit()
-        return {"status": "OK"}
+async def delete_room(
+    hotel_id: int,
+    room_id: int,
+    db: DBDep,
+):
+    await db.rooms.delete(hotel_id=hotel_id, id=room_id)
+    await db.commit()
+    return {"status": "OK"}

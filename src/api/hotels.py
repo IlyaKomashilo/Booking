@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Body, Depends
 
-from src.api.dependencies import PaginationDep
-from src.database import async_session_maker
-from src.repositories.hotels import HotelsRepository
+from src.api.dependencies import PaginationDep, DBDep
 from src.schemas.hotels import HotelCreate, HotelFilter
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -78,11 +76,13 @@ HOTEL_PATCH_EXAMPLES = {
     description="Создаёт отель и возвращает созданную сущность.",
     response_description="Статус и данные созданного отеля.",
 )
-async def create_hotel(hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES)):
-    async with async_session_maker() as session:
-        hotel = await HotelsRepository(session).create(hotel_in)
-        await session.commit()
-        return {"status": "OK", "created_hotel": hotel}
+async def create_hotel(
+    db: DBDep,
+    hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES)
+):
+    hotel = await db.hotels.create(hotel_in)
+    await db.commit()
+    return {"status": "OK", "created_hotel": hotel}
 
 
 @router.get(
@@ -91,15 +91,18 @@ async def create_hotel(hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMP
     description="Возвращает список отелей с фильтрацией по title/location (подстрока, без учёта регистра) и пагинацией.",
     response_description="Список отелей, удовлетворяющих фильтрам.",
 )
-async def read_hotels(pagination: PaginationDep, hotel_in: HotelFilter = Depends()):
+async def read_hotels(
+    pagination: PaginationDep,
+    db: DBDep,
+    hotel_in: HotelFilter = Depends()
+):
     per_page = pagination.per_page or 5
-    async with async_session_maker() as session:
-        return await HotelsRepository(session).list_hotels(
-            location=hotel_in.location,
-            title=hotel_in.title,
-            limit=per_page,
-            offset=per_page * (pagination.page - 1),
-        )
+    return await db.hotels.list_hotels(
+        location=hotel_in.location,
+        title=hotel_in.title,
+        limit=per_page,
+        offset=per_page * (pagination.page - 1),
+    )
 
 
 @router.get(
@@ -108,9 +111,11 @@ async def read_hotels(pagination: PaginationDep, hotel_in: HotelFilter = Depends
     description="Возвращает отель по его идентификатору hotel_id.",
     response_description="Данные отеля или null, если отель не найден.",
 )
-async def read_hotel(hotel_id: int):
-    async with async_session_maker() as session:
-        return await HotelsRepository(session).read_one_or_none(id=hotel_id)
+async def read_hotel(
+    hotel_id: int,
+    db: DBDep
+):
+    return await db.hotels.read_one_or_none(id=hotel_id)
 
 
 @router.put(
@@ -120,11 +125,12 @@ async def read_hotel(hotel_id: int):
     response_description="Подтверждение успешного полного обновления.",
 )
 async def replace_hotel(
-    hotel_id: int, hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES)
+    hotel_id: int,
+    db: DBDep,
+    hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES)
 ):
-    async with async_session_maker() as session:
-        await HotelsRepository(session).update(hotel_in, id=hotel_id)
-        await session.commit()
+    await db.hotels.update(hotel_in, id=hotel_id)
+    await db.commit()
     return {"status": "OK"}
 
 
@@ -135,11 +141,12 @@ async def replace_hotel(
     response_description="Подтверждение успешного частичного обновления.",
 )
 async def patch_hotel(
-    hotel_id: int, hotel_in: HotelFilter = Body(openapi_examples=HOTEL_PATCH_EXAMPLES)
+    hotel_id: int,
+    db: DBDep,
+    hotel_in: HotelFilter = Body(openapi_examples=HOTEL_PATCH_EXAMPLES)
 ):
-    async with async_session_maker() as session:
-        await HotelsRepository(session).update(hotel_in, is_patch=True, id=hotel_id)
-        await session.commit()
+    await db.hotels.update(hotel_in, is_patch=True, id=hotel_id)
+    await db.commit()
     return {"status": "OK"}
 
 
@@ -149,8 +156,10 @@ async def patch_hotel(
     description="Удаляет отель по идентификатору.",
     response_description="Подтверждение успешного удаления отеля.",
 )
-async def delete_hotel(hotel_id: int):
-    async with async_session_maker() as session:
-        await HotelsRepository(session).delete(id=hotel_id)
-        await session.commit()
+async def delete_hotel(
+    hotel_id: int,
+    db: DBDep
+):
+    await db.hotels.delete(id=hotel_id)
+    await db.commit()
     return {"status": "OK"}
