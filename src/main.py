@@ -4,12 +4,12 @@ from fastapi.openapi.docs import get_swagger_ui_html
 
 import sys
 from pathlib import Path
-
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.api.auth import router as router_auth
 from src.api.hotels import router as router_hotels
 from src.api.rooms import router as router_rooms
+from src.api.bookings import router as router_bookings
 
 app = FastAPI(docs_url=None)
 

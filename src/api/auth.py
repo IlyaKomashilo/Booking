@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException, Response
 
 from src.api.dependencies import UserIdDep, DBDep
-from src.database import async_session_maker
-from src.repositories.users import UsersRepository
 from src.schemas.users import UserCreate, UserRequestCreate
 from src.services.auth import AuthService
 
@@ -80,7 +78,7 @@ async def login_user(
     if not user:
         raise HTTPException(status_code=401, detail="Пользователь с таким email не зарегистрирован")
     if not AuthService().verify_password(user_in.password, user.hash_password):
-            raise HTTPException(status_code=401, detail="Пароль не верный")
+        raise HTTPException(status_code=401, detail="Пароль не верный")
     access_token = AuthService().create_access_token({"user_id": user.id})
     response.set_cookie(key="access_token", value=access_token)
     return {"access_token": access_token}
@@ -107,4 +105,4 @@ async def read_me(
     user_id: UserIdDep,
     db: DBDep,
 ):
-    return db.users.read_one_or_none(id=user_id)
+    return await db.users.read_one_or_none(id=user_id)
