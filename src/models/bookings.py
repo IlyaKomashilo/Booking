@@ -42,11 +42,5 @@ class BookingsOrm(Base):
     __table_args__ = (
         CheckConstraint("date_to > date_from", name="ck_bookings_date_range"),
         CheckConstraint("price >= 0", name="ck_bookings_price_non_negative"),
-        ExcludeConstraint(
-            (room_id, "="),
-            (func.daterange(date_from, date_to, "[)"), "&&"),
-            name="excl_bookings_room_no_overlap",
-            using="gist",
-        ),
         Index("ix_bookings_room_dates", room_id, date_from, date_to),
     )

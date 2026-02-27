@@ -2,22 +2,14 @@ from pydantic import BaseModel, Field, condecimal
 
 
 class RoomCreateRequest(BaseModel):
-    title: str = Field(
-        ..., min_length=1, max_length=100, description="Название категории номера."
-    )
-    description: str | None = Field(
-        default=None, max_length=1000, description="Описание категории номера."
-    )
-    price: condecimal(max_digits=10, decimal_places=2, ge=0) = Field(
-        description="Стоимость за ночь в формате decimal."
-    )
+    title: str = Field(..., min_length=1, max_length=100, description="Название категории номера.")
+    description: str | None = Field(default=None, max_length=1000, description="Описание категории номера.")
+    price: condecimal(max_digits=10, decimal_places=2, ge=0) = Field(description="Стоимость за ночь в формате decimal.")
     quantity: int = Field(..., ge=0, description="Количество номеров данной категории.")
 
 
 class RoomCreate(RoomCreateRequest):
-    hotel_id: int = Field(
-        description="Идентификатор отеля, к которому относится номер."
-    )
+    hotel_id: int = Field(description="Идентификатор отеля, к которому относится номер.")
 
 
 class Room(RoomCreate):

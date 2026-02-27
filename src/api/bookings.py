@@ -15,8 +15,5 @@ router = APIRouter(prefix="/bookings", tags=["бронирования"])
     response_description="",
 )
 async def create_booking(
-        room_id: int,
-        date_from: date,
-        date_to: date,
 ):
     pass
