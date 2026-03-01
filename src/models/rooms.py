@@ -2,8 +2,14 @@ from decimal import Decimal
 
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import (
-    BigInteger, Integer, String, Text, ForeignKey,
-    CheckConstraint, UniqueConstraint, Numeric
+    BigInteger,
+    Integer,
+    String,
+    Text,
+    ForeignKey,
+    CheckConstraint,
+    UniqueConstraint,
+    Numeric,
 )
 
 from src.database import Base
@@ -23,7 +29,6 @@ class RoomsOrm(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
-
 
     __table_args__ = (
         UniqueConstraint("hotel_id", "title", name="uq_rooms_hotel_title"),

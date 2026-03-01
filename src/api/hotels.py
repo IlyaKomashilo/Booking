@@ -77,8 +77,7 @@ HOTEL_PATCH_EXAMPLES = {
     response_description="Статус и данные созданного отеля.",
 )
 async def create_hotel(
-    db: DBDep,
-    hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES)
+    db: DBDep, hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES)
 ):
     hotel = await db.hotels.create(hotel_in)
     await db.commit()
@@ -92,9 +91,7 @@ async def create_hotel(
     response_description="Список отелей, удовлетворяющих фильтрам.",
 )
 async def read_hotels(
-    pagination: PaginationDep,
-    db: DBDep,
-    hotel_in: HotelFilter = Depends()
+    pagination: PaginationDep, db: DBDep, hotel_in: HotelFilter = Depends()
 ):
     per_page = pagination.per_page or 5
     return await db.hotels.list_hotels(
@@ -111,10 +108,7 @@ async def read_hotels(
     description="Возвращает отель по его идентификатору hotel_id.",
     response_description="Данные отеля или null, если отель не найден.",
 )
-async def read_hotel(
-    hotel_id: int,
-    db: DBDep
-):
+async def read_hotel(hotel_id: int, db: DBDep):
     return await db.hotels.read_one_or_none(id=hotel_id)
 
 
@@ -127,7 +121,7 @@ async def read_hotel(
 async def replace_hotel(
     hotel_id: int,
     db: DBDep,
-    hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES)
+    hotel_in: HotelCreate = Body(openapi_examples=HOTEL_EXAMPLES),
 ):
     await db.hotels.update(hotel_in, id=hotel_id)
     await db.commit()
@@ -143,7 +137,7 @@ async def replace_hotel(
 async def patch_hotel(
     hotel_id: int,
     db: DBDep,
-    hotel_in: HotelFilter = Body(openapi_examples=HOTEL_PATCH_EXAMPLES)
+    hotel_in: HotelFilter = Body(openapi_examples=HOTEL_PATCH_EXAMPLES),
 ):
     await db.hotels.update(hotel_in, is_patch=True, id=hotel_id)
     await db.commit()
@@ -156,10 +150,7 @@ async def patch_hotel(
     description="Удаляет отель по идентификатору.",
     response_description="Подтверждение успешного удаления отеля.",
 )
-async def delete_hotel(
-    hotel_id: int,
-    db: DBDep
-):
+async def delete_hotel(hotel_id: int, db: DBDep):
     await db.hotels.delete(id=hotel_id)
     await db.commit()
     return {"status": "OK"}

@@ -4,6 +4,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.api.auth import router as router_auth

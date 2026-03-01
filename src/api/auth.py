@@ -57,7 +57,9 @@ async def create_user(
 ):
     normalized_email = user_in.email.lower()
     hash_password = AuthService().hash_password(user_in.password)
-    await db.users.create(UserCreate(email=normalized_email, hash_password=hash_password))
+    await db.users.create(
+        UserCreate(email=normalized_email, hash_password=hash_password)
+    )
     await db.commit()
     return {"status": "OK"}
 
@@ -76,7 +78,9 @@ async def login_user(
 ):
     user = await db.users.read_user_with_hash_password(email=user_in.email.lower())
     if not user:
-        raise HTTPException(status_code=401, detail="Пользователь с таким email не зарегистрирован")
+        raise HTTPException(
+            status_code=401, detail="Пользователь с таким email не зарегистрирован"
+        )
     if not AuthService().verify_password(user_in.password, user.hash_password):
         raise HTTPException(status_code=401, detail="Пароль не верный")
     access_token = AuthService().create_access_token({"user_id": user.id})
