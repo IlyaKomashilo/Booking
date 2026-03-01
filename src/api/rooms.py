@@ -91,7 +91,7 @@ ROOM_PATCH_EXAMPLES = {
 async def create_room(
     hotel_id: int,
     db: DBDep,
-    room_in: RoomCreateRequest = Body(openapi_examples=ROOM_CREATE_EXAMPLES)
+    room_in: RoomCreateRequest = Body(openapi_examples=ROOM_CREATE_EXAMPLES),
 ):
     room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
     room = await db.rooms.create(room_data)
@@ -105,10 +105,7 @@ async def create_room(
     description="Возвращает все категории номеров, созданные для указанного отеля по hotel_id.",
     response_description="Список категорий номеров отеля.",
 )
-async def read_rooms(
-    hotel_id: int,
-    db: DBDep
-):
+async def read_rooms(hotel_id: int, db: DBDep):
     return await db.rooms.read_filtered(hotel_id=hotel_id)
 
 
@@ -118,11 +115,7 @@ async def read_rooms(
     description="Возвращает категорию номера по room_id в рамках указанного отеля hotel_id.",
     response_description="Данные категории номера или null, если запись не найдена.",
 )
-async def read_room(
-    hotel_id: int,
-    room_id: int,
-    db: DBDep
-):
+async def read_room(hotel_id: int, room_id: int, db: DBDep):
     return await db.rooms.read_one_or_none(hotel_id=hotel_id, id=room_id)
 
 
