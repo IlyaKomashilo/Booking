@@ -7,7 +7,7 @@ router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
 @router.post(
-    "/",
+    "",
     summary="Создание бронирования",
     description=(
         "Создаёт бронирование для текущего пользователя. "
@@ -24,11 +24,12 @@ async def create_booking(
 
     room = await db.rooms.read_one_or_none(id=booking_in.room_id)
     if room is None:
-        raise HTTPException(status_code=404, detail="Номер не найден")
+        raise HTTPException(
+            status_code=404, detail="Номер не найден",
+        )
     if booking_in.date_to <= booking_in.date_from:
         raise HTTPException(
-            status_code=400,
-            detail="Дата выезда должна быть позже даты заезда",
+            status_code=400, detail="Дата выезда должна быть позже даты заезда",
         )
 
     booking_data = BookingCreate(
@@ -39,3 +40,32 @@ async def create_booking(
     booking = await db.bookings.create(booking_data)
     await db.commit()
     return {"status": "OK", "created_booking": booking}
+
+
+@router.get(
+    "",
+    summary="Получение списка всех бронирований для администрирования",
+    description="Возвращает список всех бронирований",
+    response_description="Список всех бронирований",
+)
+async def read_bookings(
+    db: DBDep,
+):
+    """Возвращает список всех бронирований."""
+
+    return await db.bookings.read_all()
+
+
+@router.get(
+    "/me",
+    summary="Получение списка всех бронирований текущего пользователя",
+    description="Инициализирует пользователя и возвращает список его бронирований",
+    response_description="Список бронирований текущего пользователя",
+)
+async def read_user_bookings(
+    db: DBDep,
+    user_id: UserIdDep,
+):
+    """Возвращает список всех бронирований."""
+
+    return await db.bookings.read_filtered(user_id=user_id)

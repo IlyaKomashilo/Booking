@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Body
+from datetime import date
+
+from fastapi import APIRouter, Body, Query
 
 from src.api.dependencies import DBDep
 from src.schemas.rooms import (
@@ -105,8 +107,13 @@ async def create_room(
     description="Возвращает все категории номеров, созданные для указанного отеля по hotel_id.",
     response_description="Список категорий номеров отеля.",
 )
-async def read_rooms(hotel_id: int, db: DBDep):
-    return await db.rooms.read_filtered(hotel_id=hotel_id)
+async def read_rooms(
+        hotel_id: int,
+        db: DBDep,
+        date_from: date = Query(example='2026-04-12'),
+        date_to: date = Query(example='2026-05-03'),
+):
+    return await db.rooms.read_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
 
 
 @router.get(

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Body, Depends
+from datetime import date
+
+from fastapi import APIRouter, Body, Depends, Query
 
 from src.api.dependencies import PaginationDep, DBDep
 from src.schemas.hotels import HotelCreate, HotelFilter
@@ -87,18 +89,26 @@ async def create_hotel(
 @router.get(
     "",
     summary="Список отелей",
-    description="Возвращает список отелей с фильтрацией по title/location (подстрока, без учёта регистра) и пагинацией.",
+    description="Возвращает список отелей с фильтрацией по title/location (подстрока,без учёта регистра) и пагинацией.",
     response_description="Список отелей, удовлетворяющих фильтрам.",
 )
 async def read_hotels(
-    pagination: PaginationDep, db: DBDep, hotel_in: HotelFilter = Depends()
+    pagination: PaginationDep,
+    db: DBDep,
+    hotel_in: HotelFilter = Depends(),
+    date_from: date = Query(example='2026-04-12'),
+    date_to: date = Query(example='2026-05-03'),
+
 ):
     per_page = pagination.per_page or 5
-    return await db.hotels.list_hotels(
+    return await db.hotels.read_filtered_by_time(
+        date_from=date_from,
+        date_to=date_to,
         location=hotel_in.location,
         title=hotel_in.title,
         limit=per_page,
-        offset=per_page * (pagination.page - 1),
+        offset=per_page * (pagination.page -1)
+
     )
 
 
