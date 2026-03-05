@@ -3,7 +3,7 @@ from src.repositories.base import BaseRepository
 from src.schemas.bookings import Booking
 
 
-class BookingRepository(BaseRepository):
+class BookingsRepository(BaseRepository):
     """Репозиторий для работы с бронированиями."""
 
     model = BookingsOrm

@@ -96,8 +96,8 @@ async def read_hotels(
     pagination: PaginationDep,
     db: DBDep,
     hotel_in: HotelFilter = Depends(),
-    date_from: date = Query(example='2026-04-12'),
-    date_to: date = Query(example='2026-05-03'),
+    date_from: date = Query(),
+    date_to: date = Query(),
 
 ):
     per_page = pagination.per_page or 5

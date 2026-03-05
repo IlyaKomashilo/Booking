@@ -110,8 +110,8 @@ async def create_room(
 async def read_rooms(
         hotel_id: int,
         db: DBDep,
-        date_from: date = Query(example='2026-04-12'),
-        date_to: date = Query(example='2026-05-03'),
+        date_from: date = Query(),
+        date_to: date = Query(),
 ):
     return await db.rooms.read_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
 
