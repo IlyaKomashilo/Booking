@@ -98,7 +98,6 @@ async def read_hotels(
     hotel_in: HotelFilter = Depends(),
     date_from: date = Query(),
     date_to: date = Query(),
-
 ):
     per_page = pagination.per_page or 5
     return await db.hotels.read_filtered_by_time(
@@ -107,8 +106,7 @@ async def read_hotels(
         location=hotel_in.location,
         title=hotel_in.title,
         limit=per_page,
-        offset=per_page * (pagination.page -1)
-
+        offset=per_page * (pagination.page - 1),
     )
 
 
