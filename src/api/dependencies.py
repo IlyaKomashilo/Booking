@@ -11,7 +11,7 @@ from src.utils.db_manager import DBManager
 class PaginationParams(BaseModel):
     """Параметры пагинации для листинговых endpoint-ов."""
 
-    page: Annotated[int | None, Query(default=1, ge=1, description="Номер страницы")]
+    page: Annotated[int, Query(default=1, ge=1, description="Номер страницы")]
     per_page: Annotated[
         int | None,
         Query(default=None, ge=1, le=25, description="Количество на странице"),
