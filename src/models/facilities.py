@@ -17,7 +17,7 @@ class FacilitiesOrm(Base):
 
 
 
-class RoomFacilitiesOrm(Base):
+class RoomsFacilitiesOrm(Base):
     __tablename__ = "rooms_facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

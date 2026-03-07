@@ -69,3 +69,18 @@ async def read_user_bookings(
     """Возвращает список всех бронирований."""
 
     return await db.bookings.read_filtered(user_id=user_id)
+
+
+@router.delete(
+    "",
+    summary="Удаление бронирования",
+    description="Удаляет удобство по booking_id.",
+    response_description="Подтверждение успешного удаления.",
+)
+async def delete_bookings(
+    db: DBDep,
+    booking_id: int,
+):
+    await db.bookings.delete(id=booking_id)
+    await db.commit()
+    return {"status": "OK"}

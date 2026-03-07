@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from src.api.dependencies import DBDep
-from src.schemas.facilities import Facility, FacilityAdd
+from src.schemas.facilities import Facility, FacilityCreate
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
 )
 async def create_facility(
     db: DBDep,
-    facility_in: FacilityAdd,
+    facility_in: FacilityCreate,
 ):
     facility = await db.facilities.create(facility_in)
     await db.commit()
@@ -42,7 +42,7 @@ async def read_facilities(
 async def replace_facility(
     facility_id: int,
     db: DBDep,
-    facility_in: FacilityAdd,
+    facility_in: FacilityCreate,
 ):
     facility_data = Facility(
         id=facility_id, **facility_in.model_dump(exclude_unset=True)

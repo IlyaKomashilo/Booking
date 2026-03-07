@@ -32,3 +32,6 @@ async def custom_swagger_ui_html():
 
 if __name__ == "__main__":
     uvicorn.run("src.main:app", reload=True)
+
+# python -m src.main
+# uvicorn src.main:app --reload

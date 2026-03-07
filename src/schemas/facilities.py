@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class FacilityAdd(BaseModel):
+class FacilityCreate(BaseModel):
     """Схема для создания/обновления удобства."""
 
     title: str = Field(
@@ -13,7 +13,20 @@ class FacilityAdd(BaseModel):
     )
 
 
-class Facility(FacilityAdd):
+class Facility(FacilityCreate):
     """Схема удобства, возвращаемая в API."""
 
     id: int = Field(description="Уникальный идентификатор удобства.")
+
+
+class RoomFacilityCreate(BaseModel):
+    """ """
+
+    room_id: int = Field(description="")
+    facility_id: int = Field(description="")
+
+
+class RoomFacility(RoomFacilityCreate):
+    """ """
+
+    id: int = Field(description="")

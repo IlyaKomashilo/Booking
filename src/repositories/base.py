@@ -19,6 +19,10 @@ class BaseRepository:
         model = result.scalars().one()
         return self.schema.model_validate(model, from_attributes=True)
 
+    async def add_bulk(self, data: list[BaseModel]):
+        add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
+        await self.session.execute(add_data_stmt)
+
     async def read_filtered(self, *filter, **filter_by):
         query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)

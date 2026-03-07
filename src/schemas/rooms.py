@@ -13,6 +13,8 @@ class RoomCreateRequest(BaseModel):
     )
     quantity: int = Field(..., ge=0, description="Количество номеров данной категории.")
 
+    facilities_ids: list[int] | None = Field(default=None,description="Идентификаторы удобств")
+
 
 class RoomCreate(RoomCreateRequest):
     hotel_id: int = Field(

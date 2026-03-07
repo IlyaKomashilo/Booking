@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Body, Query
 
 from src.api.dependencies import DBDep
+from src.schemas.facilities import RoomFacilityCreate
 from src.schemas.rooms import (
     RoomCreate,
     RoomCreateRequest,
@@ -97,6 +98,8 @@ async def create_room(
 ):
     room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
     room = await db.rooms.create(room_data)
+    rooms_facilities_data = [RoomFacilityCreate(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
+    await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
     return {"status": "OK", "created_room": room}
 
