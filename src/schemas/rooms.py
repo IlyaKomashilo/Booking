@@ -13,7 +13,7 @@ class RoomCreateRequest(BaseModel):
     )
     quantity: int = Field(..., ge=0, description="Количество номеров данной категории.")
 
-    facilities_ids: list[int] | None = Field(default=None,description="Идентификаторы удобств")
+    facilities_ids: list[int] = Field(default=[],description="Идентификаторы удобств")
 
 
 class RoomCreate(BaseModel):
@@ -58,6 +58,8 @@ class RoomFilterRequest(BaseModel):
     quantity: int | None = Field(
         default=None, ge=0, description="Новое количество номеров категории."
     )
+    facilities_ids: list[int] = Field(default=[],description="Идентификаторы удобств")
+
 
 
 class RoomFilter(RoomFilterRequest):

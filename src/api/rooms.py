@@ -147,6 +147,7 @@ async def replace_room(
 ):
     room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
     await db.rooms.update(room_data, id=room_id, hotel_id=hotel_id)
+    await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
     await db.commit()
     return {"status": "OK"}
 
@@ -163,8 +164,11 @@ async def patch_room(
     db: DBDep,
     room_in: RoomFilterRequest = Body(openapi_examples=ROOM_PATCH_EXAMPLES),
 ):
-    room_data = RoomFilter(hotel_id=hotel_id, **room_in.model_dump(exclude_unset=True))
+    room_data_dict = room_in.model_dump(exclude_unset=True)
+    room_data = RoomFilter(hotel_id=hotel_id, **room_data_dict)
     await db.rooms.update(room_data, id=room_id, hotel_id=hotel_id, is_patch=True)
+    if "facilities_ids" in room_data_dict:
+        await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data_dict["facilities_ids"])
     await db.commit()
     return {"status": "OK"}
 
