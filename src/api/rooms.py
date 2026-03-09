@@ -98,20 +98,9 @@ async def create_room(
 ):
     room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
     room = await db.rooms.create(room_data)
-    rooms_facilities_data = [RoomFacilityCreate(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
+    rooms_facilities_data = [RoomFacilityCreate(room_id=room.id, facility_id=f_id) for f_id in room_in.facilities_ids]
     await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
-
-    async def create_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = Body()):
-        _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
-        room = await db.rooms.add(_room_data)
-
-        rooms_facilities_data = [RoomFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in
-                                 room_data.facilities_ids]
-        await db.rooms_facilities.add_bulk(rooms_facilities_data)
-        await db.commit()
-
-
     return {"status": "OK", "created_room": room}
 
 
