@@ -98,7 +98,7 @@ async def read_rooms(
     response_description="Данные категории номера или null, если запись не найдена.",
 )
 async def read_room(hotel_id: int, room_id: int, db: DBDep):
-    return await db.rooms.read_one_or_none(hotel_id=hotel_id, id=room_id)
+    return await db.rooms.read_one_or_none_with_rels(hotel_id=hotel_id, id=room_id)
 
 
 @router.put(

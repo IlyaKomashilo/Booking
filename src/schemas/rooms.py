@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field, condecimal
 
+from src.schemas.facilities import Facility
+
 
 class RoomCreateRequest(BaseModel):
     """Схема запроса для создания категории номера."""
@@ -43,6 +45,11 @@ class Room(RoomCreate):
 
     id: int = Field(description="Уникальный идентификатор категории номера.")
 
+
+class RoomWithRels(Room):
+    """ """
+
+    facilities:  list[Facility] = Field(description="")
 
 class RoomFilterRequest(BaseModel):
     """Схема частичного обновления категории номера."""

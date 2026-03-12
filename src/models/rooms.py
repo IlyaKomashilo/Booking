@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import (
     BigInteger,
     Integer,
@@ -29,6 +29,11 @@ class RoomsOrm(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
+
+    facilities: Mapped[list["FacilitiesOrm"]] = relationship(
+        back_populates="rooms",
+        secondary="rooms_facilities"
+    )
 
     __table_args__ = (
         UniqueConstraint("hotel_id", "title", name="uq_rooms_hotel_title"),
