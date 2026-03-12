@@ -32,33 +32,6 @@ ROOM_CREATE_EXAMPLES = {
             "quantity": 6,
         },
     },
-    "3": {
-        "summary": "Family",
-        "value": {
-            "title": "Family",
-            "description": "2 кровати + диван, мини-кухня, 35 м²",
-            "price": "219.00",
-            "quantity": 4,
-        },
-    },
-    "4": {
-        "summary": "Suite",
-        "value": {
-            "title": "Suite",
-            "description": "Гостиная + спальня, 55 м², панорамный вид",
-            "price": "399.99",
-            "quantity": 2,
-        },
-    },
-    "5": {
-        "summary": "Economy",
-        "value": {
-            "title": "Economy",
-            "description": "Компактный номер, душ, 14 м²",
-            "price": "89.00",
-            "quantity": 20,
-        },
-    },
 }
 
 ROOM_PATCH_EXAMPLES = {
@@ -67,20 +40,8 @@ ROOM_PATCH_EXAMPLES = {
         "value": {"price": "149.99"},
     },
     "2": {
-        "summary": "Изменить только количество",
-        "value": {"quantity": 10},
-    },
-    "3": {
-        "summary": "Изменить название",
-        "value": {"title": "Standard Plus"},
-    },
-    "4": {
-        "summary": "Изменить описание",
-        "value": {"description": "Обновлённое описание категории"},
-    },
-    "5": {
-        "summary": "Изменить несколько полей",
-        "value": {"title": "Family Comfort", "price": "249.00", "quantity": 3},
+        "summary": "Изменить список удобств",
+        "value": {"facilities_ids": [1, 2, 4]},
     },
 }
 
@@ -96,10 +57,17 @@ async def create_room(
     db: DBDep,
     room_in: RoomCreateRequest = Body(openapi_examples=ROOM_CREATE_EXAMPLES),
 ):
-    room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
+    room_payload = room_in.model_dump(exclude={"facilities_ids"})
+    room_data = RoomCreate(hotel_id=hotel_id, **room_payload)
     room = await db.rooms.create(room_data)
-    rooms_facilities_data = [RoomFacilityCreate(room_id=room.id, facility_id=f_id) for f_id in room_in.facilities_ids]
-    await db.rooms_facilities.add_bulk(rooms_facilities_data)
+
+    if room_in.facilities_ids:
+        rooms_facilities_data = [
+            RoomFacilityCreate(room_id=room.id, facility_id=f_id)
+            for f_id in room_in.facilities_ids
+        ]
+        await db.rooms_facilities.add_bulk(rooms_facilities_data)
+
     await db.commit()
     return {"status": "OK", "created_room": room}
 
@@ -145,9 +113,12 @@ async def replace_room(
     db: DBDep,
     room_in: RoomCreateRequest = Body(openapi_examples=ROOM_CREATE_EXAMPLES),
 ):
-    room_data = RoomCreate(hotel_id=hotel_id, **room_in.model_dump())
+    room_payload = room_in.model_dump(exclude={"facilities_ids"})
+    room_data = RoomCreate(hotel_id=hotel_id, **room_payload)
     await db.rooms.update(room_data, id=room_id, hotel_id=hotel_id)
-    await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
+    await db.rooms_facilities.set_room_facilities(
+        room_id=room_id, facilities_ids=room_in.facilities_ids
+    )
     await db.commit()
     return {"status": "OK"}
 
@@ -165,10 +136,17 @@ async def patch_room(
     room_in: RoomFilterRequest = Body(openapi_examples=ROOM_PATCH_EXAMPLES),
 ):
     room_data_dict = room_in.model_dump(exclude_unset=True)
+    facilities_ids = room_data_dict.pop("facilities_ids", None)
     room_data = RoomFilter(hotel_id=hotel_id, **room_data_dict)
-    await db.rooms.update(room_data, id=room_id, hotel_id=hotel_id, is_patch=True)
-    if "facilities_ids" in room_data_dict:
-        await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data_dict["facilities_ids"])
+
+    if room_data_dict:
+        await db.rooms.update(room_data, id=room_id, hotel_id=hotel_id, is_patch=True)
+    if facilities_ids is not None:
+        await db.rooms_facilities.set_room_facilities(
+            room_id=room_id,
+            facilities_ids=facilities_ids,
+        )
+
     await db.commit()
     return {"status": "OK"}
 
