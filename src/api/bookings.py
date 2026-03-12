@@ -25,13 +25,9 @@ async def create_booking(
     room = await db.rooms.read_one_or_none(id=booking_in.room_id)
     if room is None:
         raise HTTPException(
-            status_code=404, detail="Номер не найден",
+            status_code=404,
+            detail="Номер не найден",
         )
-    if booking_in.date_to <= booking_in.date_from:
-        raise HTTPException(
-            status_code=400, detail="Дата выезда должна быть позже даты заезда",
-        )
-
     booking_data = BookingCreate(
         user_id=user_id,
         price=room.price,
@@ -74,7 +70,7 @@ async def read_user_bookings(
 @router.delete(
     "",
     summary="Удаление бронирования",
-    description="Удаляет удобство по booking_id.",
+    description="Удаляет бронирование по booking_id.",
     response_description="Подтверждение успешного удаления.",
 )
 async def delete_bookings(

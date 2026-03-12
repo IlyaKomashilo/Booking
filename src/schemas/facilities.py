@@ -20,13 +20,13 @@ class Facility(FacilityCreate):
 
 
 class RoomFacilityCreate(BaseModel):
-    """ """
+    """Связь категории номера и удобства для записи в таблицу many-to-many."""
 
-    room_id: int = Field(description="")
-    facility_id: int = Field(description="")
+    room_id: int = Field(gt=0, description="Идентификатор категории номера.")
+    facility_id: int = Field(gt=0, description="Идентификатор удобства.")
 
 
 class RoomFacility(RoomFacilityCreate):
-    """ """
+    """Связь категории номера и удобства, возвращаемая из БД."""
 
-    id: int = Field(description="")
+    id: int = Field(description="Уникальный идентификатор связи номер-удобство.")
