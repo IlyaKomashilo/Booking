@@ -46,6 +46,5 @@ class HotelsRepository(BaseRepository):
         result = await self.session.execute(query)
 
         return [
-            self.mapper.map_to_domain_entity(hotel)
-            for hotel in result.scalars().all()
+            self.mapper.map_to_domain_entity(hotel) for hotel in result.scalars().all()
         ]

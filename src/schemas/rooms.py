@@ -47,9 +47,14 @@ class Room(RoomCreate):
 
 
 class RoomWithRels(Room):
-    """ """
+    """Схема категории номера вместе со связанными удобствами."""
 
-    facilities:  list[Facility] = Field(description="")
+    facilities: list[Facility] = Field(
+        default_factory=list,
+        description="Список удобств, привязанных к категории номера.",
+        examples=[[{"id": 1, "title": "Wi-Fi"}]],
+    )
+
 
 class RoomFilterRequest(BaseModel):
     """Схема частичного обновления категории номера."""
