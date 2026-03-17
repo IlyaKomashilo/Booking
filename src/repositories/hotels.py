@@ -5,6 +5,7 @@ from sqlalchemy import func, select
 from src.models.hotels import HotelsOrm
 from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
+from src.repositories.mappers.mappers import HotelDataMapper
 from src.repositories.utils import rooms_ids_for_booking
 from src.schemas.hotels import Hotel
 
@@ -13,7 +14,7 @@ class HotelsRepository(BaseRepository):
     """Репозиторий для работы с отелями."""
 
     model = HotelsOrm
-    schema = Hotel
+    mapper = HotelDataMapper
 
     async def read_filtered_by_time(
         self,
@@ -45,6 +46,6 @@ class HotelsRepository(BaseRepository):
         result = await self.session.execute(query)
 
         return [
-            Hotel.model_validate(hotel, from_attributes=True)
+            self.mapper.map_to_domain_entity(hotel)
             for hotel in result.scalars().all()
         ]

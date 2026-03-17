@@ -3,6 +3,7 @@ from sqlalchemy import select
 
 from src.repositories.base import BaseRepository
 from src.models.users import UsersOrm
+from src.repositories.mappers.mappers import UserDataMapper
 from src.schemas.users import User, UserWithHashPassword
 
 
@@ -10,7 +11,7 @@ class UsersRepository(BaseRepository):
     """Репозиторий для работы с пользователями."""
 
     model = UsersOrm
-    schema = User
+    mapper = UserDataMapper
 
     async def read_user_with_hash_password(self, email: EmailStr):
         """Возвращает пользователя вместе с хэшем пароля по email."""

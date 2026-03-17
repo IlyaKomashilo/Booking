@@ -5,15 +5,15 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
+from src.repositories.mappers.mappers import RoomDataWithRelsMapper, RoomDataMapper
 from src.repositories.utils import rooms_ids_for_booking
-from src.schemas.rooms import Room, RoomWithRels
 
 
 class RoomsRepository(BaseRepository):
     """Репозиторий для работы с категориями номеров."""
 
     model = RoomsOrm
-    schema = Room
+    mapper = RoomDataMapper
 
     async def read_filtered_by_time(
         self,
@@ -29,7 +29,7 @@ class RoomsRepository(BaseRepository):
             .filter(RoomsOrm.id.in_(rooms_ids_to_get))
         )
         result = await self.session.execute(query)
-        return[RoomWithRels.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+        return[RoomDataWithRelsMapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
 
     async def read_one_or_none_with_rels(self, **filter_by):
@@ -42,4 +42,4 @@ class RoomsRepository(BaseRepository):
         model = result.scalars().one_or_none()
         if model is None:
             return None
-        return RoomWithRels.model_validate(model, from_attributes=True)
+        return RoomDataWithRelsMapper.map_to_domain_entity(model)
