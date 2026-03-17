@@ -1,17 +1,20 @@
+"""Базовый интерфейс мапперов между ORM и Pydantic-схемами."""
+
 from typing import TypeVar
 
 from pydantic import BaseModel
 
 from src.database import Base
 
-
-DBModelType =TypeVar("DBModelType", bound=Base)
-SchemaType =TypeVar("SchemaType", bound=BaseModel)
+DBModelType = TypeVar("DBModelType", bound=Base)
+SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
 
 class DataMapper:
-    db_model: type[DBModelType] = None
-    schema: type[SchemaType] = None
+    """Базовый mapper для конвертации данных между слоями."""
+
+    db_model: type[DBModelType] | None = None
+    schema: type[SchemaType] | None = None
 
     @classmethod
     def map_to_domain_entity(cls, data):

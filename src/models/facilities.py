@@ -11,8 +11,7 @@ class FacilitiesOrm(Base):
     title: Mapped[str] = mapped_column(String(100), nullable=False)
 
     rooms: Mapped[list["RoomsOrm"]] = relationship(
-        back_populates="facilities",
-        secondary="rooms_facilities"
+        back_populates="facilities", secondary="rooms_facilities"
     )
 
     __table_args__ = (
@@ -21,13 +20,16 @@ class FacilitiesOrm(Base):
     )
 
 
-
 class RoomsFacilitiesOrm(Base):
     __tablename__ = "rooms_facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id", ondelete="CASCADE"),nullable=False, index=True)
-    facility_id: Mapped[int] = mapped_column(ForeignKey("facilities.id", ondelete="CASCADE"),nullable=False, index=True)
+    room_id: Mapped[int] = mapped_column(
+        ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    facility_id: Mapped[int] = mapped_column(
+        ForeignKey("facilities.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     __table_args__ = (
         UniqueConstraint(

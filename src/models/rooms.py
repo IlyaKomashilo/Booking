@@ -31,8 +31,7 @@ class RoomsOrm(Base):
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
 
     facilities: Mapped[list["FacilitiesOrm"]] = relationship(
-        back_populates="rooms",
-        secondary="rooms_facilities"
+        back_populates="rooms", secondary="rooms_facilities"
     )
 
     __table_args__ = (

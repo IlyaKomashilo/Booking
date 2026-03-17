@@ -1,9 +1,10 @@
+"""Репозитории для удобств и связей номер-удобство."""
+
 from sqlalchemy import delete, insert, select
 
 from src.models.facilities import FacilitiesOrm, RoomsFacilitiesOrm
 from src.repositories.base import BaseRepository
-from src.repositories.mappers.mappers import FacilityDataMapper
-from src.schemas.facilities import RoomFacility
+from src.repositories.mappers.mappers import FacilityDataMapper, RoomFacilityDataMapper
 
 
 class FacilitiesRepository(BaseRepository):
@@ -17,7 +18,7 @@ class RoomsFacilitiesRepository(BaseRepository):
     """Репозиторий для таблицы связей комнат и удобств."""
 
     model = RoomsFacilitiesOrm
-    schema = RoomFacility
+    mapper = RoomFacilityDataMapper
 
     async def set_room_facilities(
         self, room_id: int, facilities_ids: list[int]

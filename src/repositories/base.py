@@ -29,18 +29,14 @@ class BaseRepository:
         query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)
         return [
-            self.mapper.map_to_domain_entity(model)
-            for model in result.scalars().all()
+            self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
         ]
 
     async def read_all(self, *args, **kwargs):
         return await self.read_filtered()
 
     async def read_one_or_none(self, **filter_by):
-        query = (
-            select(self.model)
-            .filter_by(**filter_by)
-        )
+        query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
         model = result.scalars().one_or_none()
         if model is None:
