@@ -1,6 +1,7 @@
 from datetime import date
 
 from fastapi import APIRouter, Body, Depends, Query
+from fastapi_cache.decorator import cache
 
 from src.api.dependencies import PaginationDep, DBDep
 from src.schemas.hotels import HotelCreate, HotelFilter
@@ -92,6 +93,7 @@ async def create_hotel(
     description="Возвращает список отелей с фильтрацией по title/location (подстрока,без учёта регистра) и пагинацией.",
     response_description="Список отелей, удовлетворяющих фильтрам.",
 )
+@cache(expire=30)
 async def read_hotels(
     pagination: PaginationDep,
     db: DBDep,
@@ -116,6 +118,7 @@ async def read_hotels(
     description="Возвращает отель по его идентификатору hotel_id.",
     response_description="Данные отеля или null, если отель не найден.",
 )
+@cache(expire=30)
 async def read_hotel(hotel_id: int, db: DBDep):
     return await db.hotels.read_one_or_none(id=hotel_id)
 

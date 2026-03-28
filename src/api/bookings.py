@@ -1,6 +1,8 @@
 """API-эндпоинты для управления бронированиями."""
 
 from fastapi import APIRouter, HTTPException
+from fastapi_cache.decorator import cache
+
 
 from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingCreate, BookingCreateRequest
@@ -55,6 +57,7 @@ async def create_booking(
     description="Возвращает список всех бронирований.",
     response_description="Список всех бронирований.",
 )
+@cache(expire=30)
 async def read_bookings(db: DBDep):
     """Возвращает список всех бронирований."""
 
@@ -67,6 +70,7 @@ async def read_bookings(db: DBDep):
     description="Инициализирует пользователя и возвращает список его бронирований.",
     response_description="Список бронирований текущего пользователя.",
 )
+@cache(expire=30)
 async def read_user_bookings(
     db: DBDep,
     user_id: UserIdDep,

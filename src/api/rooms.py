@@ -1,6 +1,8 @@
 from datetime import date
 
 from fastapi import APIRouter, Body, Query
+from fastapi_cache.decorator import cache
+
 
 from src.api.dependencies import DBDep
 from src.schemas.facilities import RoomFacilityCreate
@@ -78,6 +80,7 @@ async def create_room(
     description="Возвращает все категории номеров, созданные для указанного отеля по hotel_id.",
     response_description="Список категорий номеров отеля.",
 )
+@cache(expire=30)
 async def read_rooms(
     hotel_id: int,
     db: DBDep,
@@ -97,6 +100,7 @@ async def read_rooms(
     description="Возвращает категорию номера по room_id в рамках указанного отеля hotel_id.",
     response_description="Данные категории номера или null, если запись не найдена.",
 )
+@cache(expire=30)
 async def read_room(hotel_id: int, room_id: int, db: DBDep):
     return await db.rooms.read_one_or_none_with_rels(hotel_id=hotel_id, id=room_id)
 
